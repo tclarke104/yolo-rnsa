@@ -9,6 +9,8 @@ from preprocessing import BatchGenerator
 import random
 import numpy as np
 from preprocessing import get_test_image
+from utils import decode_netout
+from skimage import resize
 
 LABELS = ['PN']
 
@@ -393,13 +395,14 @@ class Yolo:
 
         return loss
 
-    def predict(self):
+    def predict(self, image_fp):
+        dummy_array = np.zeros((1, 1, 1, 1, 50, 4))
         test_img = get_test_image(image_fp)
 
         test_img = resize(test_img, (416, 416, 3))
         test_img = test_img.reshape((1, 416, 416, 3))
 
-        out = model.predict([test_img, dummy_array])
+        out = self.model.predict([test_img, dummy_array])
 
         boxes = decode_netout(out, ANCHORS, CLASS, 0.1)
         print(out[0])
